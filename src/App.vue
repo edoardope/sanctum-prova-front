@@ -15,6 +15,7 @@ export default {
       email: "santo@leoleo",
       password: "leonardo",
       token: localStorage['token'],
+      remember: ''
     }
   },
   created() {
@@ -25,10 +26,10 @@ export default {
       return new URL(imgPath, import.meta.url).href;
     },
     login() {
-      if (!localStorage['token']) {
+      if (!this.token && this.remember) {
 
         axios.post('http://127.0.0.1:8000/api/auth/login', {
-          name: this.name,
+
           email: this.email,
           password: this.password
         }).then(res=>(
@@ -36,7 +37,19 @@ export default {
           localStorage['token'] = res.data.token,
           this.token = localStorage['token']
         ))
+      } else if(!this.token) {
+        axios.post('http://127.0.0.1:8000/api/auth/login', {
+
+          email: this.email,
+          password: this.password
+        }).then(res=>(
+          console.log(res.data.message),
+          this.token = res.data.token,
+          console.log("non sari ricordato")
+          
+        ))
       } else {
+        
         console.log("gia loggato")
       }
 
@@ -53,6 +66,8 @@ export default {
     <input  v-model="this.name" type="text" name="" id="">
     <input v-model="this.email" type="text" name="" id="">
     <input v-model="this.password" type="text" name="" id="">
+    <input v-model="this.remember" type="checkbox" name="" id="">
+    <label for="">remember me</label>
     <input @click="login()" type="button" value="login">
     <input @click="logout()" type="button" value="logout">
     <p v-if="(this.token)">your token is: {{this.token}}</p>
